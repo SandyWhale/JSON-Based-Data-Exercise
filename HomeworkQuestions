@@ -1,0 +1,84 @@
+import pandas as pd
+import json
+from pandas.io.json import json_normalize
+
+#Question Number 1
+
+#imports the world bank projects.json file
+json_file = pd.read_json('data/world_bank_projects.json')
+#groups the dataframe by countryname, showing only the project name column, then count the number of times each project -
+#shows up grouped by country, then the values are sorted in a decending order and the entire series is converted to a dataframe
+ngroup = json_file.groupby('countryname')['project_name'].count().sort_values(ascending=False).to_frame()
+#here a count title is applied to the number of counts for clarity 
+ngroup.columns = ['counts']
+ngroup
+
+
+#Question Number 2
+
+#here a function is created to split a string by commmas, then return it as a list
+def clean(string):
+    string = string.split(',')
+    return list(set(string))
+
+#the function is applied to the mjthemecode
+new_theme_col  = json_file['mjthemecode'].apply(clean)
+
+#named a new column project_theme_number with the list of lists
+json_file['project_theme_number'] = new_theme_col
+
+#this part below is just to apply the column to an object so I can print it out
+json_file_number = json_file['project_theme_number']
+
+#takes the array(list of lists) in json_file['project_theme_number'] and return a dictionary with occurrance of each value
+from collections import defaultdict 
+counts = defaultdict(int)
+
+for codes in json_file['project_theme_number'].values:
+    
+    for code in codes:
+        counts[code]+=1
+
+print(counts)
+
+#since the resulting dictionary is out of order, I reordered it into a list
+new_counts = sorted(counts.items(), reverse=True, key=lambda x:x[1])
+
+for i in new_counts:
+    print(i[0], "::", i[1])
+
+
+#Top 10 major project themes: 11, 10, 2, 8, 4, 6, 7, 5, 9, 1
+
+
+
+#Question Number 3
+
+#build a dictionary that contains mapping from codes to names
+
+code_to_theme = {}
+
+themes = json_file['mjtheme_namecode']
+
+#here we take each key and value and assign each key with a value, using the existing values in the json_file['mjtheme_namecode'] column
+for theme in themes:
+    for entry in theme:
+        code = entry['code'].strip()
+        name = entry['name'].strip()
+        if name != '':
+            code_to_theme[code] = name
+
+
+#This is the final output object where we output the values the way it was originally in json_file['mjtheme_namecode']
+fixed_themes = []
+
+for theme in themes:
+    fixed = []
+    for entry in theme:
+        code = entry['code'].strip()
+        name = entry['name'].strip()
+        if name == '':
+            name = code_to_theme[code]
+        fixed.append({'name': name, 'code':code})
+    fixed_themes.append(fixed)
+        
