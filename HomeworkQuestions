@@ -2,6 +2,7 @@ import pandas as pd
 import json
 from pandas.io.json import json_normalize
 
+#-------------------
 #Question Number 1
 
 #imports the world bank projects.json file
@@ -13,7 +14,7 @@ ngroup = json_file.groupby('countryname')['project_name'].count().sort_values(as
 ngroup.columns = ['counts']
 ngroup
 
-
+#-------------------
 #Question Number 2
 
 #here a function is created to split a string by commmas, then return it as a list
@@ -51,7 +52,7 @@ for i in new_counts:
 #Top 10 major project themes: 11, 10, 2, 8, 4, 6, 7, 5, 9, 1
 
 
-
+#-------------------
 #Question Number 3
 
 #build a dictionary that contains mapping from codes to names
